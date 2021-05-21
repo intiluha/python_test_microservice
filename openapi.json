@@ -1,0 +1,637 @@
+{
+  "info": {
+    "description": "This API allows to create, change and delete network interfaces on internal VM via ssh.",
+    "title": "Network Interfaces Management Service",
+    "version": "1.0"
+  },
+  "paths": {
+    "/interfaces": {
+      "get": {
+        "summary": "Return all interfaces",
+        "description": "Return all interfaces created through API.",
+        "operationId": "get_interfaces",
+        "responses": {
+          "200": {
+            "description": "list of all interfaces created through API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Interface"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add new interface",
+        "description": "Create interface with given name and, possibly, set its mtu. Also can bind one or many specified IP addresses to newly created interface. Name MUST NOT match name of any existing interface, including system interfaces.",
+        "operationId": "post_interface",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Interface"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "interface was successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Interface"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "interface cannot be created, because name is already in use",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interfaces/{int_id}": {
+      "get": {
+        "summary": "Return selected interface",
+        "description": "Return interface with given id.",
+        "operationId": "get_interface",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "int_id",
+            "description": "interface id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "interface with given id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Interface"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "interface not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Change interface",
+        "description": "Change name and/or mtu of interface previously created through API. If a list of addresses is passed, deletes addresses outside of this list and creates missing addresses. Name MUST NOT match name of any existing interface, including system interfaces.",
+        "operationId": "put_interface",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Interface"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "int_id",
+            "description": "interface id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "interface was successfully changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Interface"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "interface not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "interface cannot be changed, because name is already in use",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete interface",
+        "description": "Delete interface previously created through API.",
+        "operationId": "delete_interface",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "int_id",
+            "description": "interface id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "interface deleted"
+          },
+          "404": {
+            "description": "interface not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/addresses/{addr_id}": {
+      "get": {
+        "summary": "Return selected address",
+        "description": "Return address with given id.",
+        "operationId": "get_address",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "addr_id",
+            "description": "address id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "address with given id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Address"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "address not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete address",
+        "description": "Delete address previously assigned through API.",
+        "operationId": "delete_address",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "addr_id",
+            "description": "address id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "address deleted"
+          },
+          "404": {
+            "description": "address not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/addresses": {
+      "get": {
+        "summary": "Return all IP addresses",
+        "description": "Return all IP addresses assigned to some interfaces through API.",
+        "operationId": "get_addresses",
+        "responses": {
+          "200": {
+            "description": "list of all addresses assigned through API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Address"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Assign address",
+        "description": "Assign address to a previously created interface.",
+        "operationId": "post_addresses",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Address"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "address successfully assigned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Address"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "interface not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "this address is already assigned to this interface",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interfaces/{int_id}/addresses/{addr_id}": {
+      "get": {
+        "summary": "Return selected address",
+        "description": "Return address with given id assigned to interface with given id.",
+        "operationId": "get_address_by_interface",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "int_id",
+            "description": "interface id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "addr_id",
+            "description": "address id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "address with given id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConciseAddress"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "address not found or interface_id of address does not match given int_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete address",
+        "description": "Delete address previously assigned through API to given interface.",
+        "operationId": "delete_address_by_interface",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "int_id",
+            "description": "interface id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "addr_id",
+            "description": "address id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "address deleted"
+          },
+          "404": {
+            "description": "address not found or interface_id of address does not match given int_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interfaces/{int_id}/addresses": {
+      "get": {
+        "summary": "Return addresses by interface",
+        "description": "Return all IP addresses assigned to given interface through API.",
+        "operationId": "get_addresses_by_interface",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "int_id",
+            "description": "interface id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "all IP addresses assigned to given interface through API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConciseAddress"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "interface not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Assign address",
+        "description": "Assign address to given interface.",
+        "operationId": "post_addresses_by_interface",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Address"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "int_id",
+            "description": "interface id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "address successfully assigned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConciseAddress"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "interface not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "this address is already assigned to this interface",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "openapi": "3.0.3",
+  "components": {
+    "schemas": {
+      "ConciseAddress": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "address"
+        ]
+      },
+      "Interface": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[0-9A-Za-z_]+$"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConciseAddress"
+            }
+          },
+          "mtu": {
+            "type": "integer",
+            "default": 1500,
+            "minimum": 0,
+            "maximum": 999999999
+          },
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "interface_id": {
+            "type": "integer"
+          },
+          "address": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "address",
+          "interface_id"
+        ]
+      },
+      "Error": {
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
